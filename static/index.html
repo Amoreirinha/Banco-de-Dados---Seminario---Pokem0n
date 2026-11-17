@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-br"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PokéDB · Grupo 11</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#0f1226;--bg2:#1c1f4a;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.12);--red:#ee1515;--yellow:#ffcb05;}
+body{font-family:Poppins,sans-serif;color:#f1f3ff;min-height:100vh;
+  background:radial-gradient(circle at 15% 0%,#2b2f7a 0,transparent 45%),radial-gradient(circle at 90% 30%,#5a1530 0,transparent 40%),linear-gradient(160deg,var(--bg1),var(--bg2));background-attachment:fixed}
+.pixel{font-family:'Press Start 2P',monospace}
+.topbar{background:linear-gradient(90deg,var(--red),#b00d2c);border-bottom:4px solid #111;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.pokeball{width:42px;height:42px;border-radius:50%;border:4px solid #111;position:relative;flex:none;
+  background:linear-gradient(180deg,#fff 0 46%,#111 46% 54%,#fff 54%)}
+.pokeball:after{content:"";position:absolute;inset:50% auto auto 50%;width:14px;height:14px;margin:-7px;border-radius:50%;background:#fff;border:4px solid #111}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.panel-h{padding:.8rem 1.2rem;border-bottom:1px solid var(--line);font-weight:700;display:flex;align-items:center;gap:.6rem}
+.panel-h small{margin-left:auto;font-weight:400;opacity:.55;font-size:.7rem}
+.player-select{background:#00000040;color:#fff;border:2px solid #fff;border-radius:12px}
+.player-select option{color:#000}
+.mon{display:flex;gap:1.2rem;flex-wrap:wrap;padding:1.2rem}
+.mon-art{width:190px;max-width:100%;filter:drop-shadow(0 12px 14px rgba(0,0,0,.5));animation:float 3s ease-in-out infinite}
+.mon-glow{position:relative;display:grid;place-items:center;width:210px}
+.mon-glow:before{content:"";position:absolute;width:170px;height:170px;border-radius:50%;background:var(--glow,#f08030);opacity:.35;filter:blur(30px)}
+@keyframes float{50%{transform:translateY(-10px)}}
+.mon-info{flex:1;min-width:230px}
+.type{display:inline-block;padding:.1rem .7rem;border-radius:20px;font-size:.72rem;font-weight:700;color:#fff;margin-right:.3rem;text-shadow:0 1px 2px #0006}
+.lvl{background:var(--yellow);color:#222;border-radius:10px;padding:.1rem .6rem;font-weight:700;font-size:.8rem}
+.bar{height:10px;border-radius:8px;background:#0006;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:8px;transition:width .8s}
+.lab{font-size:.7rem;opacity:.75;display:flex;justify-content:space-between;margin:.55rem 0 .15rem}
+.evo{display:flex;align-items:center;gap:.6rem;background:#0004;border-radius:12px;padding:.4rem .7rem;margin-top:.8rem;font-size:.8rem}
+.evo img{width:44px;filter:brightness(.3) contrast(1.2)}
+.btn-xp{background:linear-gradient(180deg,#ffdd33,#f5a300);color:#222;font-weight:700;border:3px solid #111;border-radius:14px;box-shadow:0 4px 0 #111;transition:.1s}
+.btn-xp:hover{transform:translateY(2px);box-shadow:0 2px 0 #111}.btn-xp:disabled{opacity:.6}
+.item{display:flex;align-items:center;gap:.8rem;padding:.55rem 1.2rem;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}.item img{width:38px;image-rendering:pixelated}
+.item .qty{margin-left:auto;font-weight:700;background:#0005;border-radius:10px;padding:.1rem .7rem}
+.rar{font-size:.68rem;border-radius:8px;padding:.05rem .5rem;font-weight:700}
+.rar-Comum{background:#9aa0b8;color:#111}.rar-Rara{background:#a855f7}.rar-Épica{background:#f59e0b;color:#111}
+.rank{display:flex;align-items:center;gap:.8rem;padding:.55rem 1.2rem;border-bottom:1px solid var(--line)}
+.rank:last-child{border:0}.rank .medal{font-size:1.4rem;width:2rem}.rank b.n{margin-left:auto}
+.tl{max-height:360px;overflow:auto}
+.ev{display:grid;grid-template-columns:44px 1fr auto;gap:.8rem;align-items:center;padding:.65rem 1.2rem;border-bottom:1px solid var(--line)}
+.ev .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:1.2rem}
+.ev .chg{font-family:monospace;font-size:.85rem}.ev .when{font-size:.72rem;opacity:.6;text-align:right}
+.ev.new{animation:flash 2s}@keyframes flash{0%{background:#ffcb0555}100%{background:transparent}}
+.toastx{position:fixed;right:1.2rem;bottom:1.2rem;background:#111;border:2px solid var(--yellow);border-radius:14px;padding:.8rem 1.1rem;
+  transform:translateY(150%);transition:.35s;z-index:20;max-width:300px}.toastx.show{transform:none}
+.levelup{position:fixed;inset:0;display:none;place-items:center;z-index:30;background:#000a;pointer-events:none}
+.levelup.show{display:grid;animation:fade 2.2s forwards}
+.levelup div{font-size:clamp(1.4rem,5vw,3rem);color:var(--yellow);text-shadow:4px 4px 0 var(--red);animation:pop .6s}
+@keyframes pop{0%{transform:scale(.2) rotate(-8deg)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes fade{0%,80%{opacity:1}100%{opacity:0}}
+.empty{padding:1.2rem;opacity:.6}
+</style></head><body>
+<div class="topbar py-3 mb-4"><div class="container d-flex align-items-center gap-3 flex-wrap">
+  <div class="pokeball"></div>
+  <div><div class="pixel" style="font-size:1rem">PokéDB</div><small class="opacity-75">Bancos de Dados na Indústria de Jogos · Grupo 11 / Equipe 13</small></div>
+  <select id="sel" class="form-select player-select w-auto ms-auto" aria-label="Jogador"></select>
+</div></div>
+
+<main class="container pb-5"><div class="row g-4">
+  <section class="col-lg-7">
+    <div class="panel mb-4"><div class="panel-h">🎮 Treinador <span id="trainer"></span><small>Query 1 · Perfil</small></div><div id="perfil"></div></div>
+    <div class="panel"><div class="panel-h">📜 Histórico de Progressão (Auditoria)<small>Query 2</small></div><div class="tl" id="hist"></div></div>
+  </section>
+  <aside class="col-lg-5">
+    <div class="panel mb-4"><div class="panel-h">🎒 Mochila<small>Query 3</small></div><div id="inv"></div></div>
+    <div class="panel"><div class="panel-h">🏆 Ranking<small>Query 4</small></div><div id="rank"></div></div>
+  </aside>
+</div></main>
+
+<div class="toastx" id="toast"></div>
+<div class="levelup" id="lvl"><div class="pixel">LEVEL UP!</div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "—").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const get = u => fetch(u).then(r => r.json());
+const BASE = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites";
+const ART = id => `${BASE}/pokemon/other/official-artwork/${id}.png`;
+const PB = `${BASE}/items/poke-ball.png`;
+// número na Pokédex nacional (o sprite é só visual; o DER não muda)
+const DEX = {Bulbasaur:1,Charmander:4,Charmeleon:5,Charizard:6,Squirtle:7,Pikachu:25};
+const ITEM = {"Poção":"potion","Pokébola":"poke-ball","Pedra de Fogo":"fire-stone"};
+const TYPE = {Fogo:"#f08030",Voador:"#8f7be0",Água:"#6890f0",Planta:"#78c850",Elétrico:"#d8a800",Normal:"#a8a878"};
+const EVT = {CAPTURA_POKEMON:["🎯","Captura","#2563eb"],SUBIU_NIVEL:["⬆️","Subiu de nível","#16a34a"],GANHO_XP:["✨","Ganhou XP","#d97706"]};
+const STAT = {hp:"HP",atk:"Ataque",def:"Defesa"};
+const medals = ["🥇","🥈","🥉"];
+let pid = null;
+
+const typeBadge = t => t ? `<span class="type" style="background:${TYPE[t]||"#666"}">${esc(t)}</span>` : "";
+const art = nome => DEX[nome] ? ART(DEX[nome]) : PB;
+
+function monCard(p) {
+  const need = p.nivel * 100, xpPct = Math.min(100, p.experiencia / need * 100);
+  const hpMax = p.status_base?.hp || p.hp_atual || 1, hpPct = Math.min(100, p.hp_atual / hpMax * 100);
+  const stats = Object.entries(p.status_base || {}).filter(([k]) => k !== "hp").map(([k, v]) =>
+    `<div class="lab"><span>${esc(STAT[k] || k)}</span><b>${esc(v)}</b></div><div class="bar"><i style="width:${Math.min(100, v / 150 * 100)}%;background:#60a5fa"></i></div>`).join("");
+  const evo = p.evolui_para ? `<div class="evo"><img src="${art(p.evolui_para)}" alt="" onerror="this.src='${PB}'">
+      <div>Evolui para <b>${esc(p.evolui_para)}</b> no nível <b>${p.nivel_evolucao}</b>
+      <div class="bar mt-1"><i style="width:${Math.min(100, p.nivel / p.nivel_evolucao * 100)}%;background:#c084fc"></i></div></div></div>` : "";
+  return `<div class="mon">
+    <div class="mon-glow" style="--glow:${TYPE[p.tipo_primario] || "#888"}"><img class="mon-art" src="${art(p.especie)}" alt="${esc(p.especie)}" onerror="this.src='${PB}'"></div>
+    <div class="mon-info">
+      <h4 class="mb-1">${esc(p.apelido)} <span class="lvl">Nv ${p.nivel}</span></h4>
+      <div class="mb-2"><small class="opacity-75">${esc(p.especie)}</small> ${typeBadge(p.tipo_primario)}${typeBadge(p.tipo_secundario)}</div>
+      <div class="lab"><span>HP</span><b>${p.hp_atual}/${hpMax}</b></div><div class="bar"><i style="width:${hpPct}%;background:${hpPct > 50 ? "#22c55e" : "#ef4444"}"></i></div>
+      <div class="lab"><span>Experiência</span><b>${p.experiencia}/${need}</b></div><div class="bar"><i style="width:${xpPct}%;background:#facc15"></i></div>
+      ${stats}${evo}
+      <button class="btn btn-xp mt-3 px-4" id="btnxp" onclick="xp(${p.id_personagem})">⚡ Ganhar Experiência (+50 XP)</button>
+    </div></div>`;
+}
+
+async function load() {
+  const jid = $("sel").value;
+  const [perfil, inv, rank] = await Promise.all([get(`/api/jogador/${jid}/perfil`), get(`/api/jogador/${jid}/inventario`), get("/api/ranking")]);
+  $("trainer").textContent = perfil[0] ? "· " + perfil[0].nome_usuario : "";
+  $("perfil").innerHTML = perfil.length ? perfil.map(monCard).join("") : `<div class="empty">Este jogador ainda não tem Pokémon.</div>`;
+  pid = perfil[0]?.id_personagem ?? null;
+  $("inv").innerHTML = inv.length ? inv.map(i => `<div class="item">
+      <img src="${BASE}/items/${ITEM[i.nome] || "poke-ball"}.png" alt="" onerror="this.style.display='none'">
+      <div><div class="fw-semibold">${esc(i.nome)}</div><span class="rar rar-${esc(i.raridade)}">${esc(i.raridade)}</span></div>
+      <span class="qty">×${i.quantidade}</span></div>`).join("") : `<div class="empty">Mochila vazia.</div>`;
+  $("rank").innerHTML = rank.map((r, n) => `<div class="rank"><span class="medal">${medals[n] || n + 1}</span>
+      <span class="${r.nome_usuario === $("sel").selectedOptions[0].text ? "fw-bold text-warning" : ""}">${esc(r.nome_usuario)}</span>
+      <b class="n">${r.total_niveis} <small class="opacity-50">níveis</small></b></div>`).join("");
+  await hist();
+}
+
+async function hist(novos = 0) {
+  if (!pid) { $("hist").innerHTML = `<div class="empty">Sem histórico.</div>`; return; }
+  const h = await get(`/api/personagem/${pid}/historico`);
+  $("hist").innerHTML = h.map((r, n) => {
+    const [ic, nome, cor] = EVT[r.tipo_evento] || ["📌", r.tipo_evento, "#555"];
+    return `<div class="ev ${n < novos ? "new" : ""}"><div class="ic" style="background:${cor}55">${ic}</div>
+      <div><div class="fw-semibold">${esc(nome)}</div><div class="chg">${esc(r.entidade_ref)}: ${esc(r.valor_anterior)} → ${esc(r.valor_novo)}</div></div>
+      <div class="when">${esc(r.timestamp)}</div></div>`;
+  }).join("");
+}
+
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2600); }
+
+async function xp(id) {
+  $("btnxp").disabled = true;
+  try {
+    const r = await (await fetch(`/api/personagem/${id}/ganhar-xp`, {method: "POST"})).json();
+    if (!r.ok) throw new Error(r.erro || "falha");
+    await load(); await hist(r.subiu_nivel ? 2 : 1);
+    toast(`+${r.xp_ganho} XP registrados na auditoria`);
+    if (r.subiu_nivel) { $("lvl").classList.add("show"); setTimeout(() => $("lvl").classList.remove("show"), 2200); }
+  } catch (e) { toast("Erro: " + e.message); $("btnxp") && ($("btnxp").disabled = false); }
+}
+
+get("/api/jogadores").then(js => {
+  $("sel").innerHTML = js.map(j => `<option value="${j.id_jogador}">${esc(j.nome_usuario)}</option>`).join("");
+  $("sel").onchange = load; load();
+});
+</script></body></html>
